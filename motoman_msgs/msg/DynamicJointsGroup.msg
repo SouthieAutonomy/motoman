@@ -3,7 +3,14 @@
 #    id:   control-group ID for use on-controller
 #    num_joints: # of joints in this motion group
 #    valid_fields: #bit field for following items
-#    # length of the following items must match num_joints, order set by controller.  Invalid fields (see bit field above) are not included, resulting in a shorter message.
+
+#    !! Jay, More on invalid fields: (from http://roswiki.autolabor.com.cn/attachments/motoman_driver/MotoRos_EDS.pdf)
+#        Bit-mask indicating which “optional” fields are filled with data.
+#        1 = time, 2 = position, 4 = velocity, 8 = acceleration
+#        MotoROS expects all values, so this value should be set to 7.
+
+#    # length of the following items must match num_joints, order set by controller.
+#    # Invalid fields (see bit field above) are not included, resulting in a shorter message.
 #    positions[]
 #    velocities[]
 #    accelerations[]
