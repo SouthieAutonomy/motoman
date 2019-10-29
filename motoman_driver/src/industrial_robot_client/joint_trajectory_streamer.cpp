@@ -130,19 +130,19 @@ void JointTrajectoryStreamer::jointTrajectoryCB(const trajectory_msgs::JointTraj
   // read current state value (should be atomic)
   int state = this->state_;
 
-  ROS_DEBUG("Current state is: %d", state);
-  if (TransferStates::IDLE != state)
-  {
-    if (msg->points.empty())
-      ROS_INFO("Empty trajectory received, canceling current trajectory");
-    else
-      ROS_ERROR("Trajectory splicing not yet implemented, stopping current motion.");
-
-    this->mutex_.lock();
-    trajectoryStop();
-    this->mutex_.unlock();
-    return;
-  }
+  // ROS_WARN("Current state is: %d", state);
+  // if (TransferStates::IDLE != state)
+  // {
+  //   if (msg->points.empty())
+  //     ROS_INFO("Empty trajectory received, canceling current trajectory");
+  //   else
+  //     ROS_ERROR("Trajectory splicing not yet implemented, stopping current motion.");
+  //
+  //   this->mutex_.lock();
+  //   trajectoryStop();
+  //   this->mutex_.unlock();
+  //   return;
+  // }
 
   if (msg->points.empty())
   {
@@ -298,4 +298,3 @@ void JointTrajectoryStreamer::trajectoryStop()
 
 }  // namespace joint_trajectory_streamer
 }  // namespace industrial_robot_client
-

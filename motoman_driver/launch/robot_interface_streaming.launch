@@ -48,7 +48,7 @@
 	     high-level robot control
 	-->
 	<node if="$(arg version0)" name="joint_trajectory_action"
-		pkg="industrial_robot_client" type="joint_trajectory_action" />
+		pkg="industrial_robot_client" type="joint_trajectory_action" output="screen" />
 	<node unless="$(arg version0)" name="joint_trajectory_action"
-		pkg="motoman_driver" type="motoman_driver_joint_trajectory_action" />
+		pkg="motoman_driver" type="motoman_driver_joint_trajectory_action" output="screen" />
 </launch>
