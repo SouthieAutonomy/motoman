@@ -95,8 +95,8 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
   srv_write_single_io_ = node_.advertiseService("/write_single_io", &MotomanJointTrajectoryStreamer::writeSingleIoCB, this);
 
   disabler_ = node_.advertiseService("/robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
-
   enabler_ = node_.advertiseService("/robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
+  srv_ready_ = node_.advertiseService("/robot_ready", &MotomanJointTrajectoryStreamer::checkReadyCB, this);
 
   return rtn;
 }
@@ -118,8 +118,8 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
   rtn &= motion_ctrl_.init(connection, robot_id_);
 
   disabler_ = node_.advertiseService("robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
-
   enabler_ = node_.advertiseService("robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
+  srv_ready_ = node_.advertiseService("/robot_ready", &MotomanJointTrajectoryStreamer::checkReadyCB, this);
 
   // hacking this in here at this place
   io_ctrl_.init(connection);
@@ -153,6 +153,20 @@ bool MotomanJointTrajectoryStreamer::disableRobotCB(std_srvs::Trigger::Request &
     ROS_WARN_STREAM(res.message);
   }
 
+
+  return true;
+
+}
+
+bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &req,
+						   std_srvs::Trigger::Response &res)
+{
+  bool ret = motion_ctrl_.controllerReady();
+  res.success = ret;
+  if (!res.success) {
+    res.message="NOT READY;";
+    ROS_ERROR_STREAM(res.message);
+  }
 
   return true;
 

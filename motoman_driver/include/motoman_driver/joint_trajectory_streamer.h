@@ -169,6 +169,8 @@ protected:
    */
   ros::ServiceServer enabler_;
 
+  ros::ServiceServer srv_ready_;
+
   /**
    * \brief Disable the robot. Response is true if the state was flipped or
    * false if the state has not changed.
@@ -185,7 +187,8 @@ protected:
   bool enableRobotCB(std_srvs::Trigger::Request &req,
                      std_srvs::Trigger::Response &res);
 
-
+  bool checkReadyCB(std_srvs::Trigger::Request &req,
+			              std_srvs::Trigger::Response &res);
 };
 
 }  // namespace joint_trajectory_streamer
