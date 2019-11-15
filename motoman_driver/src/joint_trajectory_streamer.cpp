@@ -91,12 +91,12 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
 
   // hacking this in here at this place
   io_ctrl_.init(connection);
-  this->srv_read_single_io = node_.advertiseService("read_single_io", &MotomanJointTrajectoryStreamer::readSingleIoCB, this);
-  this->srv_write_single_io = node_.advertiseService("write_single_io", &MotomanJointTrajectoryStreamer::writeSingleIoCB, this);
+  srv_read_single_io_ = node_.advertiseService("/read_single_io", &MotomanJointTrajectoryStreamer::readSingleIoCB, this);
+  srv_write_single_io_ = node_.advertiseService("/write_single_io", &MotomanJointTrajectoryStreamer::writeSingleIoCB, this);
 
-  disabler_ = node_.advertiseService("robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
+  disabler_ = node_.advertiseService("/robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
 
-  enabler_ = node_.advertiseService("robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
+  enabler_ = node_.advertiseService("/robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
 
   return rtn;
 }
@@ -120,6 +120,11 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
   disabler_ = node_.advertiseService("robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
 
   enabler_ = node_.advertiseService("robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
+
+  // hacking this in here at this place
+  io_ctrl_.init(connection);
+  srv_read_single_io_ = node_.advertiseService("/read_single_io", &MotomanJointTrajectoryStreamer::readSingleIoCB, this);
+  srv_write_single_io_ = node_.advertiseService("/write_single_io", &MotomanJointTrajectoryStreamer::writeSingleIoCB, this);
 
   return rtn;
 }
