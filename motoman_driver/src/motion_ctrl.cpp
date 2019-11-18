@@ -87,6 +87,13 @@ bool MotomanMotionCtrl::setTrajMode(bool enable)
     return false;
   }
 
+  // If disabling the trajectory we should also turn the servos off
+  if (!enable){
+    ROS_INFO("Turning off the servos.");
+    cmd = MotionControlCmds::ROS_CMD_STOP_SERVOS;
+    if (!sendAndReceive(cmd, reply)) { ROS_ERROR("Failed to turn servos off"); }
+  }
+  
   return true;
 }
 
@@ -144,4 +151,3 @@ std::string MotomanMotionCtrl::getErrorString(const MotionReply &reply)
 
 }  // namespace motion_ctrl
 }  // namespace motoman
-

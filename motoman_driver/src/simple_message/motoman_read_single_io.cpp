@@ -84,29 +84,29 @@ bool ReadSingleIO::operator==(ReadSingleIO &rhs)
 
 bool ReadSingleIO::load(industrial::byte_array::ByteArray *buffer)
 {
-  LOG_COMM("Executing ReadSingleIO command load");
+  ROS_INFO("Executing ReadSingleIO command load");
 
   if (!buffer->load(this->address_))
   {
-    LOG_ERROR("Failed to load ReadSingleIO address");
+    ROS_ERROR("Failed to load ReadSingleIO address");
     return false;
   }
 
-  LOG_COMM("ReadSingleIO data successfully loaded");
+  ROS_INFO("ReadSingleIO data successfully loaded");
   return true;
 }
 
 bool ReadSingleIO::unload(industrial::byte_array::ByteArray *buffer)
 {
-  LOG_COMM("Executing ReadSingleIO command unload");
+  ROS_INFO("Executing ReadSingleIO command unload");
 
   if (!buffer->unload(this->address_))
   {
-    LOG_ERROR("Failed to unload ReadSingleIO address");
+    ROS_ERROR("Failed to unload ReadSingleIO address");
     return false;
   }
 
-  LOG_COMM("ReadSingleIO data successfully unloaded");
+  ROS_INFO("ReadSingleIO data successfully unloaded");
   return true;
 }
 

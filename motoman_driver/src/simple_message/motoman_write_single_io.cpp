@@ -87,41 +87,41 @@ bool WriteSingleIO::operator==(WriteSingleIO &rhs)
 
 bool WriteSingleIO::load(industrial::byte_array::ByteArray *buffer)
 {
-  LOG_COMM("Executing WriteSingleIO command load");
+  ROS_INFO("Executing WriteSingleIO command load");
 
   if (!buffer->load(this->address_))
   {
-    LOG_ERROR("Failed to load WriteSingleIO address");
+    ROS_ERROR("Failed to load WriteSingleIO address");
     return false;
   }
 
   if (!buffer->load(this->value_))
   {
-    LOG_ERROR("Failed to load WriteSingleIO value");
+    ROS_ERROR("Failed to load WriteSingleIO value");
     return false;
   }
 
-  LOG_COMM("WriteSingleIO data successfully loaded");
+  ROS_INFO("WriteSingleIO data successfully loaded");
   return true;
 }
 
 bool WriteSingleIO::unload(industrial::byte_array::ByteArray *buffer)
 {
-  LOG_COMM("Executing WriteSingleIO command unload");
+  ROS_INFO("Executing WriteSingleIO command unload");
 
   if (!buffer->load(this->value_))
   {
-    LOG_ERROR("Failed to unload WriteSingleIO value");
+    ROS_ERROR("Failed to unload WriteSingleIO value");
     return false;
   }
 
   if (!buffer->unload(this->address_))
   {
-    LOG_ERROR("Failed to unload WriteSingleIO address");
+    ROS_ERROR("Failed to unload WriteSingleIO address");
     return false;
   }
 
-  LOG_COMM("WriteSingleIO data successfully unloaded");
+  ROS_INFO("WriteSingleIO data successfully unloaded");
   return true;
 }
 

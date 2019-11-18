@@ -63,6 +63,8 @@ enum MotionControlCmd
   STOP_MOTION        = 200111,  // stop robot motion immediately
   START_TRAJ_MODE    = 200121,  // prepare controller to receive ROS motion cmds
   STOP_TRAJ_MODE     = 200122,  // return motion control to INFORM
+
+  ROS_CMD_STOP_SERVOS = 200113, // disable the servos 
 };
 }  // namespace MotionControlCmds
 typedef MotionControlCmds::MotionControlCmd MotionControlCmd;

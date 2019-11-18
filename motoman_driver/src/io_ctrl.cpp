@@ -89,6 +89,8 @@ bool MotomanIoCtrl::writeSingleIO(shared_int address, shared_int value)
     ROS_ERROR("Failed to send WRITE_SINGLE_IO command");
     return false;
   }
+  std::cout << reply.getResultCode() << "\n";
+  std::cout << reply.getResultString() << "\n";
 
   return (reply.getResultCode() == WriteSingleIOReplyResults::SUCCESS);
 }
@@ -126,6 +128,8 @@ bool MotomanIoCtrl::sendAndReceive(shared_int address, shared_int value, WriteSi
   data.init(address, value);
   write_io_msg.init(data);
   write_io_msg.toRequest(req);
+
+  std::cout << "Attempting to write to address: " << address << " => value: " << value << "\n";
 
   if (!this->connection_->sendAndReceiveMsg(req, res))
   {
