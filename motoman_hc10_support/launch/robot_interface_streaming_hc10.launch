@@ -10,7 +10,7 @@
 -->
 <launch>
 	<arg name="robot_ip" />
-	
+
   <!-- controller: Controller name (yrc1000) -->
 
   <arg name="controller"/>
@@ -22,6 +22,6 @@
 	</include>
 
 
-	<node name="robot_state_publisher" pkg="robot_state_publisher" 
-		type="robot_state_publisher" />
+	<node name="robot_state_publisher" pkg="robot_state_publisher"
+		type="robot_state_publisher" respawn="true"/>
 </launch>
