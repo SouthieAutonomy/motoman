@@ -55,6 +55,25 @@ bool MotomanMotionCtrl::init(SmplMsgConnection* connection, int robot_id)
   return true;
 }
 
+ControllerReadyResponse MotomanMotionCtrl::controllerReadyVerbose()
+{
+  std::string err_str;
+  MotionReply reply;
+
+  ControllerReadyResponse resp;
+  if (!sendAndReceive(MotionControlCmds::CHECK_MOTION_READY, reply))
+  {
+    ROS_ERROR("Failed to send CHECK_MOTION_READY command");
+    resp.success = false;
+    resp.verbose = "Failed to send CHECK_MOTION_READY command";
+    return resp;
+  }
+
+  resp.success = (reply.getResult() == MotionReplyResults::TRUE);
+  resp.verbose = getErrorString(reply);
+  return resp;
+}
+
 bool MotomanMotionCtrl::controllerReady()
 {
   std::string err_str;
@@ -93,7 +112,7 @@ bool MotomanMotionCtrl::setTrajMode(bool enable)
     cmd = MotionControlCmds::ROS_CMD_STOP_SERVOS;
     if (!sendAndReceive(cmd, reply)) { ROS_ERROR("Failed to turn servos off"); }
   }
-  
+
   return true;
 }
 

@@ -161,13 +161,16 @@ bool MotomanJointTrajectoryStreamer::disableRobotCB(std_srvs::Trigger::Request &
 bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &req,
 						   std_srvs::Trigger::Response &res)
 {
-  bool ret = motion_ctrl_.controllerReady();
-  res.success = ret;
-  if (!res.success) {
-    res.message="NOT READY;";
-    ROS_ERROR_STREAM(res.message);
-  }
+  auto reply = motion_ctrl_.controllerReadyVerbose();
+  res.success = reply.success;
 
+  if (!res.success){
+    res.message = "NOT READY;" + reply.message;
+  }
+  else {
+    res.message = reply.message;
+  }
+  
   return true;
 
 }

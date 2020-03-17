@@ -36,6 +36,12 @@
 #include "motoman_driver/simple_message/motoman_motion_ctrl.h"
 #include "motoman_driver/simple_message/motoman_motion_reply.h"
 
+
+struct ControllerReadyResponse{
+  bool success;
+  std::string verbose;
+};
+
 namespace motoman
 {
 namespace motion_ctrl
@@ -60,6 +66,7 @@ public:
 
 public:
   bool controllerReady();
+  ControllerReadyResponse controllerReadyVerbose();
   bool setTrajMode(bool enable);
   bool stopTrajectory();
 
