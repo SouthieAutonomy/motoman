@@ -165,12 +165,12 @@ bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &re
   res.success = reply.success;
 
   if (!res.success){
-    res.message = "NOT READY;" + reply.message;
+    res.message = "NOT READY;" + reply.verbose;
   }
   else {
-    res.message = reply.message;
+    res.message = reply.verbose;
   }
-  
+
   return true;
 
 }
