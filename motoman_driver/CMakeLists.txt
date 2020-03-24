@@ -33,6 +33,7 @@ include_directories(
 
 add_definitions(-DLINUXSOCKETS=1)  #use linux sockets for communication
 add_definitions(-DROS=1)
+add_compile_options(-std=c++11)
 
 catkin_package(
   CATKIN_DEPENDS
