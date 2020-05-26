@@ -89,8 +89,8 @@ bool MotomanIoCtrl::writeSingleIO(shared_int address, shared_int value)
     ROS_ERROR("Failed to send WRITE_SINGLE_IO command");
     return false;
   }
-  std::cout << reply.getResultCode() << "\n";
-  std::cout << reply.getResultString() << "\n";
+  // std::cout << reply.getResultCode() << "\n";
+  // std::cout << reply.getResultString() << "\n";
 
   return (reply.getResultCode() == WriteSingleIOReplyResults::SUCCESS);
 }

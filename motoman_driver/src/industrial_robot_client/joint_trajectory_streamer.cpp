@@ -89,12 +89,51 @@ JointTrajectoryStreamer::~JointTrajectoryStreamer()
 
 void JointTrajectoryStreamer::jointTrajectoryCB(const motoman_msgs::DynamicJointTrajectoryConstPtr &msg)
 {
-  ROS_INFO("Receiving joint trajectory message");
+  auto start = ros::Time::now();
+  ROS_DEBUG("Receiving joint trajectory message");
 
   // read current state value (should be atomic)
   int state = this->state_;
 
   ROS_DEBUG("Current state is: %d", state);
+  if (TransferStates::IDLE != state)
+  {
+    if (msg->points.empty())
+      ROS_INFO("Empty trajectory received, canceling current trajectory");
+    else
+      ROS_ERROR("Trajectory splicing not yet implemented, stopping current motion.");
+
+    this->mutex_.lock();
+    trajectoryStop();
+    this->mutex_.unlock();
+    return;
+  }
+
+  if (msg->points.empty())
+  {
+    ROS_WARN("Empty trajectory received while in IDLE state, nothing is done");
+    return;
+  }
+
+  // calc new trajectory
+  std::vector<SimpleMessage> new_traj_msgs;
+  if (!trajectory_to_msgs(msg, &new_traj_msgs))
+    return;
+
+  // send command messages to robot
+  send_to_robot(new_traj_msgs);
+  ROS_INFO("MotoROS: jointTrajectoryCB time: %f", (ros::Time::now() - start).toSec());
+}
+
+void JointTrajectoryStreamer::jointTrajectoryCB(const trajectory_msgs::JointTrajectoryConstPtr &msg)
+{
+  ros::Time start = ros::Time::now();
+  ROS_INFO("Receiving joint trajectory message");
+
+  // read current state value (should be atomic)
+  int state = this->state_;
+
+  ROS_WARN("Current state is: %d", state);
   if (TransferStates::IDLE != state)
   {
     if (msg->points.empty())
@@ -121,47 +160,13 @@ void JointTrajectoryStreamer::jointTrajectoryCB(const motoman_msgs::DynamicJoint
 
   // send command messages to robot
   send_to_robot(new_traj_msgs);
-}
-
-void JointTrajectoryStreamer::jointTrajectoryCB(const trajectory_msgs::JointTrajectoryConstPtr &msg)
-{
-  ROS_INFO("Receiving joint trajectory message");
-
-  // read current state value (should be atomic)
-  int state = this->state_;
-
-  // ROS_WARN("Current state is: %d", state);
-  // if (TransferStates::IDLE != state)
-  // {
-  //   if (msg->points.empty())
-  //     ROS_INFO("Empty trajectory received, canceling current trajectory");
-  //   else
-  //     ROS_ERROR("Trajectory splicing not yet implemented, stopping current motion.");
-  //
-  //   this->mutex_.lock();
-  //   trajectoryStop();
-  //   this->mutex_.unlock();
-  //   return;
-  // }
-
-  if (msg->points.empty())
-  {
-    ROS_INFO("Empty trajectory received while in IDLE state, nothing is done");
-    return;
-  }
-
-  // calc new trajectory
-  std::vector<SimpleMessage> new_traj_msgs;
-  if (!trajectory_to_msgs(msg, &new_traj_msgs))
-    return;
-
-  // send command messages to robot
-  send_to_robot(new_traj_msgs);
+  ROS_INFO("MotoROS: jointTrajectoryCB time: %f", (ros::Time::now() - start).toSec());
 }
 
 bool JointTrajectoryStreamer::send_to_robot(const std::vector<SimpleMessage>& messages)
 {
-  ROS_INFO("Loading trajectory, setting state to streaming");
+  auto start = ros::Time::now();
+  ROS_DEBUG("Loading trajectory, setting state to streaming");
   this->mutex_.lock();
   {
     ROS_INFO("Executing trajectory of size: %d", static_cast<int>(messages.size()));
@@ -171,12 +176,13 @@ bool JointTrajectoryStreamer::send_to_robot(const std::vector<SimpleMessage>& me
     this->streaming_start_ = ros::Time::now();
   }
   this->mutex_.unlock();
-
+  ROS_INFO("MotoROS: send_to_robot time: %f", (ros::Time::now() - start).toSec());
   return true;
 }
 
 bool JointTrajectoryStreamer::trajectory_to_msgs(const trajectory_msgs::JointTrajectoryConstPtr &traj, std::vector<SimpleMessage>* msgs)
 {
+  auto start = ros::Time::now();
   // use base function to transform points
   if (!JointTrajectoryInterface::trajectory_to_msgs(traj, msgs))
     return false;
@@ -188,7 +194,7 @@ bool JointTrajectoryStreamer::trajectory_to_msgs(const trajectory_msgs::JointTra
     while (msgs->size() < (size_t)min_buffer_size_)
       msgs->push_back(msgs->back());
   }
-
+  ROS_INFO("MotoROS: trajectory_to_msgs time: %f", (ros::Time::now() - start).toSec());
   return true;
 }
 
@@ -243,7 +249,7 @@ void JointTrajectoryStreamer::streamingThread()
     switch (this->state_)
     {
     case TransferStates::IDLE:
-      ros::Duration(0.250).sleep();  //  slower loop while waiting for new trajectory
+      ros::Duration(0.05).sleep();  //  slower loop while waiting for new trajectory
       break;
 
     case TransferStates::STREAMING:
