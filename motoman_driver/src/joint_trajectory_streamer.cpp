@@ -161,6 +161,17 @@ bool MotomanJointTrajectoryStreamer::disableRobotCB(std_srvs::Trigger::Request &
 bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &req,
 						   std_srvs::Trigger::Response &res)
 {
+  // Check if the motoman execution file exists
+  struct stat buffer;
+  std::string name = std::getenv("HOME");
+  name += "/.motoman_executing";
+  if (stat (name.c_str(), &buffer) == 0){
+  // if ( std::experimental::filesystem::exists("$HOME/.motoman_executing")){
+    res.success = true;
+    res.message = "MOTOMAN: EXECUTING";
+    return true;
+  }
+
   auto reply = motion_ctrl_.controllerReadyVerbose();
   res.success = reply.success;
 
