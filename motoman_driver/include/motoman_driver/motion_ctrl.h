@@ -35,7 +35,7 @@
 #include "simple_message/smpl_msg_connection.h"
 #include "motoman_driver/simple_message/motoman_motion_ctrl.h"
 #include "motoman_driver/simple_message/motoman_motion_reply.h"
-
+#include <mutex>
 
 struct ControllerReadyResponse{
   bool success;
@@ -75,6 +75,7 @@ public:
 protected:
   SmplMsgConnection* connection_;
   int robot_id_;
+  std::mutex *motion_cmd_lock_;
 
   bool sendAndReceive(MotionControlCmd command, MotionReply &reply);
 };
