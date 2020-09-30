@@ -314,7 +314,7 @@ void JointTrajectoryAction::cancelCB(JointTractoryActionServer::GoalHandle gh)
 
   ROS_DEBUG("Received action cancel request");
   action_started_ = false;
-  system("rm -f $HOME/.motoman_executing");
+  // system("rm -f $HOME/.motoman_executing");
 }
 
 void JointTrajectoryAction::goalCB(JointTractoryActionServer::GoalHandle gh, int group_number)
@@ -348,6 +348,7 @@ void JointTrajectoryAction::goalCB(JointTractoryActionServer::GoalHandle gh, int
 
         ROS_INFO("Publishing trajectory");
         system("touch $HOME/.motoman_executing");
+        ROS_INFO("Created execution file");
 
         current_traj_map_[group_number] = active_goal_map_[group_number].getGoal()->trajectory;
 
@@ -434,7 +435,7 @@ void JointTrajectoryAction::goalCB(JointTractoryActionServer::GoalHandle gh, int
   }
 
   action_started_ = false;
-  system("rm -f $HOME/.motoman_executing");
+  // system("rm -f $HOME/.motoman_executing");
 }
 
 void JointTrajectoryAction::cancelCB(
