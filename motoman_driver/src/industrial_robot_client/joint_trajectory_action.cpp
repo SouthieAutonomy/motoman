@@ -195,6 +195,7 @@ void JointTrajectoryAction::goalCB(JointTractoryActionServer::GoalHandle gh)
   gh.setAccepted();
   action_started_ = true;
   system("touch $HOME/.motoman_executing");
+  std::cout << "  > STARTING GOAL CALLBACK\n";
 
   int group_number;
 
