@@ -195,7 +195,6 @@ void JointTrajectoryAction::goalCB(JointTractoryActionServer::GoalHandle gh)
   gh.setAccepted();
   action_started_ = true;
   system("touch $HOME/.motoman_executing");
-  std::cout << "  > STARTING GOAL CALLBACK\n";
 
   int group_number;
 
@@ -348,6 +347,7 @@ void JointTrajectoryAction::goalCB(JointTractoryActionServer::GoalHandle gh, int
         has_active_goal_map_[group_number]  = true;
 
         ROS_INFO("Publishing trajectory");
+        system("touch $HOME/.motoman_executing");
 
         current_traj_map_[group_number] = active_goal_map_[group_number].getGoal()->trajectory;
 
