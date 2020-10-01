@@ -466,6 +466,8 @@ void MotomanJointTrajectoryStreamer::streamingThread()
       {
         ROS_DEBUG("Robot disconnected.  Attempting reconnect...");
         connectRetryCount = 5;
+        ROS_INFO("Removing motoman execution file");
+        system("rm -f $HOME/.motoman_executing");
         break;
       }
 
@@ -482,6 +484,8 @@ void MotomanJointTrajectoryStreamer::streamingThread()
         {
           ROS_ERROR("Aborting trajectory: Unable to parse JointTrajectoryPoint reply");
           this->state_ = TransferStates::IDLE;
+          ROS_INFO("Removing motoman execution file");
+          system("rm -f $HOME/.motoman_executing");
           break;
         }
 
@@ -499,6 +503,8 @@ void MotomanJointTrajectoryStreamer::streamingThread()
                            << " (#" << this->current_point_ << "): "
                            << MotomanMotionCtrl::getErrorString(reply_status.reply_));
           this->state_ = TransferStates::IDLE;
+          ROS_INFO("Removing motoman execution file");
+          system("rm -f $HOME/.motoman_executing");
           break;
         }
       }
@@ -506,6 +512,8 @@ void MotomanJointTrajectoryStreamer::streamingThread()
     default:
       ROS_ERROR("Joint trajectory streamer: unknown state");
       this->state_ = TransferStates::IDLE;
+      ROS_INFO("Removing motoman execution file");
+      system("rm -f $HOME/.motoman_executing"); 
       break;
     }
     this->mutex_.unlock();
