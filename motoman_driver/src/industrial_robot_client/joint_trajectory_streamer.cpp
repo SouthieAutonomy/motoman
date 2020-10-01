@@ -256,6 +256,7 @@ void JointTrajectoryStreamer::streamingThread()
       if (this->current_point_ >= static_cast<int>(this->current_traj_.size()))
       {
         ROS_INFO("Trajectory streaming complete, setting state to IDLE");
+        system("touch $HOME/MOTOMAN_IDLE");
         this->state_ = TransferStates::IDLE;
         break;
       }
