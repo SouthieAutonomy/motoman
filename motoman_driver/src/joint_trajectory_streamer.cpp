@@ -97,6 +97,7 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
   disabler_ = node_.advertiseService("/robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
   enabler_ = node_.advertiseService("/robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
   srv_ready_ = node_.advertiseService("/robot_ready", &MotomanJointTrajectoryStreamer::checkReadyCB, this);
+  system("rm -f $HOME/.motoman_executing");
 
   return rtn;
 }
@@ -125,6 +126,7 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
   io_ctrl_.init(connection);
   srv_read_single_io_ = node_.advertiseService("/read_single_io", &MotomanJointTrajectoryStreamer::readSingleIoCB, this);
   srv_write_single_io_ = node_.advertiseService("/write_single_io", &MotomanJointTrajectoryStreamer::writeSingleIoCB, this);
+  system("rm -f $HOME/.motoman_executing");
 
   return rtn;
 }
@@ -168,7 +170,7 @@ bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &re
   if (stat (name.c_str(), &buffer) == 0){
   // if ( std::experimental::filesystem::exists("$HOME/.motoman_executing")){
     res.success = true;
-    res.message = "MOTOMAN: EXECUTING";
+    res.message = "Success (0) : Executing Trajectory (1)";
     return true;
   }
 
@@ -513,7 +515,7 @@ void MotomanJointTrajectoryStreamer::streamingThread()
       ROS_ERROR("Joint trajectory streamer: unknown state");
       this->state_ = TransferStates::IDLE;
       ROS_INFO("Removing motoman execution file");
-      system("rm -f $HOME/.motoman_executing"); 
+      system("rm -f $HOME/.motoman_executing");
       break;
     }
     this->mutex_.unlock();
