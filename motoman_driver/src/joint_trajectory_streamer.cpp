@@ -457,6 +457,8 @@ void MotomanJointTrajectoryStreamer::streamingThread()
       {
         ROS_INFO("Trajectory streaming complete, setting state to IDLE");
         this->state_ = TransferStates::IDLE;
+        ROS_INFO("Removing motoman execution file");
+        system("rm -f $HOME/.motoman_executing");
         break;
       }
 
