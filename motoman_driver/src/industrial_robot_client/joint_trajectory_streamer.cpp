@@ -154,14 +154,16 @@ void JointTrajectoryStreamer::jointTrajectoryCB(const trajectory_msgs::JointTraj
     return;
   }
 
-  ROS_INFO("Sending trajectory as message");
 
   // calc new trajectory
   std::vector<SimpleMessage> new_traj_msgs;
-  if (!trajectory_to_msgs(msg, &new_traj_msgs))
+  if (!trajectory_to_msgs(msg, &new_traj_msgs)){
     return;
+  }
 
   // send command messages to robot
+  ROS_INFO("Sending trajectory as message");
+  system("touch $HOME/.motoman_executing");
   send_to_robot(new_traj_msgs);
   ROS_INFO("MotoROS: jointTrajectoryCB time: %f", (ros::Time::now() - start).toSec());
 }
@@ -259,9 +261,9 @@ void JointTrajectoryStreamer::streamingThread()
       if (this->current_point_ >= static_cast<int>(this->current_traj_.size()))
       {
         ROS_INFO("Trajectory streaming complete, setting state to IDLE");
-        system("touch $HOME/MOTOMAN_IDLE");
-        ROS_INFO("Created MOTOMAN_IDLE file status");
         this->state_ = TransferStates::IDLE;
+        ROS_INFO("Removing motoman execution file");
+        system("rm -f $HOME/.motoman_executing");
         break;
       }
 

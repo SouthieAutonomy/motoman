@@ -194,7 +194,6 @@ void JointTrajectoryAction::goalCB(JointTractoryActionServer::GoalHandle gh)
 {
   gh.setAccepted();
   action_started_ = true;
-  system("touch $HOME/.motoman_executing");
 
   int group_number;
 
@@ -314,7 +313,6 @@ void JointTrajectoryAction::cancelCB(JointTractoryActionServer::GoalHandle gh)
 
   ROS_DEBUG("Received action cancel request");
   action_started_ = false;
-  // system("rm -f $HOME/.motoman_executing");
 }
 
 void JointTrajectoryAction::goalCB(JointTractoryActionServer::GoalHandle gh, int group_number)
@@ -435,7 +433,6 @@ void JointTrajectoryAction::goalCB(JointTractoryActionServer::GoalHandle gh, int
   }
 
   action_started_ = false;
-  // system("rm -f $HOME/.motoman_executing");
 }
 
 void JointTrajectoryAction::cancelCB(
