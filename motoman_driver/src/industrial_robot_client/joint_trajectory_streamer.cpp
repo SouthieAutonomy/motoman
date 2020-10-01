@@ -115,6 +115,7 @@ void JointTrajectoryStreamer::jointTrajectoryCB(const motoman_msgs::DynamicJoint
     return;
   }
 
+  ROS_INFO("Sending trajectory as message");
   // calc new trajectory
   std::vector<SimpleMessage> new_traj_msgs;
   if (!trajectory_to_msgs(msg, &new_traj_msgs))
@@ -152,6 +153,8 @@ void JointTrajectoryStreamer::jointTrajectoryCB(const trajectory_msgs::JointTraj
     ROS_INFO("Empty trajectory received while in IDLE state, nothing is done");
     return;
   }
+
+  ROS_INFO("Sending trajectory as message");
 
   // calc new trajectory
   std::vector<SimpleMessage> new_traj_msgs;
