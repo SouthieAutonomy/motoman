@@ -257,6 +257,7 @@ void JointTrajectoryStreamer::streamingThread()
       {
         ROS_INFO("Trajectory streaming complete, setting state to IDLE");
         system("touch $HOME/MOTOMAN_IDLE");
+        ROS_INFO("Created MOTOMAN_IDLE file status");
         this->state_ = TransferStates::IDLE;
         break;
       }
