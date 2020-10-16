@@ -31,6 +31,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 #include <motoman_driver/industrial_robot_client/joint_trajectory_action.h>
 #include "motoman_driver/industrial_robot_client/motoman_utils.h"
 #include <industrial_robot_client/utils.h>
@@ -192,6 +193,7 @@ void JointTrajectoryAction::watchdog(const ros::TimerEvent &e, int group_number)
 void JointTrajectoryAction::goalCB(JointTractoryActionServer::GoalHandle gh)
 {
   gh.setAccepted();
+  action_started_ = true;
 
   int group_number;
 
@@ -310,6 +312,7 @@ void JointTrajectoryAction::cancelCB(JointTractoryActionServer::GoalHandle gh)
   //  void JointTrajectoryAction::cancelCB(JointTractoryActionServer::GoalHandle & gh, int group_number)
 
   ROS_DEBUG("Received action cancel request");
+  action_started_ = false;
 }
 
 void JointTrajectoryAction::goalCB(JointTractoryActionServer::GoalHandle gh, int group_number)
@@ -342,6 +345,8 @@ void JointTrajectoryAction::goalCB(JointTractoryActionServer::GoalHandle gh, int
         has_active_goal_map_[group_number]  = true;
 
         ROS_INFO("Publishing trajectory");
+        system("touch $HOME/.motoman_executing");
+        ROS_INFO("Created execution file");
 
         current_traj_map_[group_number] = active_goal_map_[group_number].getGoal()->trajectory;
 
@@ -426,6 +431,8 @@ void JointTrajectoryAction::goalCB(JointTractoryActionServer::GoalHandle gh, int
   {
     ROS_WARN_STREAM("Ignoring goal path tolerance, option not supported by ROS-Industrial drivers");
   }
+
+  action_started_ = false;
 }
 
 void JointTrajectoryAction::cancelCB(
@@ -662,5 +669,3 @@ bool JointTrajectoryAction::withinGoalConstraints(
 
 }  // namespace joint_trajectory_action
 }  // namespace industrial_robot_client
-
-

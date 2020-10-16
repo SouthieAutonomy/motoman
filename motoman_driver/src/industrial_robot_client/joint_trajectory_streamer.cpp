@@ -115,6 +115,7 @@ void JointTrajectoryStreamer::jointTrajectoryCB(const motoman_msgs::DynamicJoint
     return;
   }
 
+  ROS_INFO("Sending trajectory as message");
   // calc new trajectory
   std::vector<SimpleMessage> new_traj_msgs;
   if (!trajectory_to_msgs(msg, &new_traj_msgs))
@@ -153,12 +154,16 @@ void JointTrajectoryStreamer::jointTrajectoryCB(const trajectory_msgs::JointTraj
     return;
   }
 
+
   // calc new trajectory
   std::vector<SimpleMessage> new_traj_msgs;
-  if (!trajectory_to_msgs(msg, &new_traj_msgs))
+  if (!trajectory_to_msgs(msg, &new_traj_msgs)){
     return;
+  }
 
   // send command messages to robot
+  ROS_INFO("Sending trajectory as message");
+  system("touch $HOME/.motoman_executing");
   send_to_robot(new_traj_msgs);
   ROS_INFO("MotoROS: jointTrajectoryCB time: %f", (ros::Time::now() - start).toSec());
 }

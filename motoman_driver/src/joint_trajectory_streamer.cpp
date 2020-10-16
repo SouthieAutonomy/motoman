@@ -97,6 +97,7 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
   disabler_ = node_.advertiseService("/robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
   enabler_ = node_.advertiseService("/robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
   srv_ready_ = node_.advertiseService("/robot_ready", &MotomanJointTrajectoryStreamer::checkReadyCB, this);
+  system("rm -f $HOME/.motoman_executing");
 
   // Attempt to remove the boot up alarms
   motion_ctrl_.resetAlarm();
@@ -127,6 +128,7 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
   io_ctrl_.init(connection);
   srv_read_single_io_ = node_.advertiseService("/read_single_io", &MotomanJointTrajectoryStreamer::readSingleIoCB, this);
   srv_write_single_io_ = node_.advertiseService("/write_single_io", &MotomanJointTrajectoryStreamer::writeSingleIoCB, this);
+  system("rm -f $HOME/.motoman_executing");
 
   // Attempt to remove the boot up alarms
   motion_ctrl_.resetAlarm();
@@ -165,6 +167,17 @@ bool MotomanJointTrajectoryStreamer::disableRobotCB(std_srvs::Trigger::Request &
 bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &req,
 						   std_srvs::Trigger::Response &res)
 {
+  // Check if the motoman execution file exists
+  struct stat buffer;
+  std::string name = std::getenv("HOME");
+  name += "/.motoman_executing";
+  if (stat (name.c_str(), &buffer) == 0){
+  // if ( std::experimental::filesystem::exists("$HOME/.motoman_executing")){
+    res.success = true;
+    res.message = "Success (0) : Executing Trajectory (1)";
+    return true;
+  }
+
   auto reply = motion_ctrl_.controllerReadyVerbose();
   res.success = reply.success;
 
@@ -451,6 +464,8 @@ void MotomanJointTrajectoryStreamer::streamingThread()
       {
         ROS_INFO("Trajectory streaming complete, setting state to IDLE");
         this->state_ = TransferStates::IDLE;
+        ROS_INFO("Removing motoman execution file");
+        system("rm -f $HOME/.motoman_executing");
         break;
       }
 
@@ -458,6 +473,8 @@ void MotomanJointTrajectoryStreamer::streamingThread()
       {
         ROS_DEBUG("Robot disconnected.  Attempting reconnect...");
         connectRetryCount = 5;
+        ROS_INFO("Removing motoman execution file");
+        system("rm -f $HOME/.motoman_executing");
         break;
       }
 
@@ -474,6 +491,8 @@ void MotomanJointTrajectoryStreamer::streamingThread()
         {
           ROS_ERROR("Aborting trajectory: Unable to parse JointTrajectoryPoint reply");
           this->state_ = TransferStates::IDLE;
+          ROS_INFO("Removing motoman execution file");
+          system("rm -f $HOME/.motoman_executing");
           break;
         }
 
@@ -491,6 +510,8 @@ void MotomanJointTrajectoryStreamer::streamingThread()
                            << " (#" << this->current_point_ << "): "
                            << MotomanMotionCtrl::getErrorString(reply_status.reply_));
           this->state_ = TransferStates::IDLE;
+          ROS_INFO("Removing motoman execution file");
+          system("rm -f $HOME/.motoman_executing");
           break;
         }
       }
@@ -498,6 +519,8 @@ void MotomanJointTrajectoryStreamer::streamingThread()
     default:
       ROS_ERROR("Joint trajectory streamer: unknown state");
       this->state_ = TransferStates::IDLE;
+      ROS_INFO("Removing motoman execution file");
+      system("rm -f $HOME/.motoman_executing");
       break;
     }
     this->mutex_.unlock();

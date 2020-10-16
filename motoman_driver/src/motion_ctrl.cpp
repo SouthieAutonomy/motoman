@@ -52,6 +52,7 @@ bool MotomanMotionCtrl::init(SmplMsgConnection* connection, int robot_id)
 {
   connection_ = connection;
   robot_id_ = robot_id;
+  motion_cmd_lock_ = new std::mutex();
   return true;
 }
 
@@ -156,6 +157,7 @@ bool MotomanMotionCtrl::stopTrajectory()
 
 bool MotomanMotionCtrl::sendAndReceive(MotionControlCmd command, MotionReply &reply)
 {
+  motion_cmd_lock_->lock();
   SimpleMessage req, res;
   MotionCtrl data;
   MotionCtrlMessage ctrl_msg;
@@ -165,15 +167,15 @@ bool MotomanMotionCtrl::sendAndReceive(MotionControlCmd command, MotionReply &re
   ctrl_msg.init(data);
   ctrl_msg.toRequest(req);
 
-  if (!this->connection_->sendAndReceiveMsg(req, res))
-  {
+  if (!this->connection_->sendAndReceiveMsg(req, res)){
     ROS_ERROR("Failed to send MotionCtrl message");
+    motion_cmd_lock_->unlock();
     return false;
   }
 
   ctrl_reply.init(res);
   reply.copyFrom(ctrl_reply.reply_);
-
+  motion_cmd_lock_->unlock();
   return true;
 }
 

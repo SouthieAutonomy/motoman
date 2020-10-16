@@ -43,6 +43,8 @@
 #include "motoman_msgs/ReadSingleIO.h"
 #include "motoman_msgs/WriteSingleIO.h"
 #include "std_srvs/Trigger.h"
+#include <experimental/filesystem>
+#include <sys/stat.h>
 
 namespace motoman
 {

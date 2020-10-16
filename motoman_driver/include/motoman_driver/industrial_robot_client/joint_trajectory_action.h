@@ -126,7 +126,7 @@ private:
   /**
    * \brief Indicates action has an active goal
    */
-  bool has_active_goal_;
+  bool has_active_goal_, action_started_;
 
   std::map<int, bool> has_active_goal_map_;
 
@@ -289,4 +289,3 @@ private:
 }  // namespace industrial_robot_client
 
 #endif /* MOTOMAN_DRIVER_INDUSTRIAL_ROBOT_CLIENT_JOINT_TRAJECTORY_ACTION_H */
-
