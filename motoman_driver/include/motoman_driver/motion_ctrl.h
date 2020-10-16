@@ -69,6 +69,7 @@ public:
   ControllerReadyResponse controllerReadyVerbose();
   bool setTrajMode(bool enable);
   bool stopTrajectory();
+  bool resetAlarm();
 
   static std::string getErrorString(const MotionReply &reply);
 

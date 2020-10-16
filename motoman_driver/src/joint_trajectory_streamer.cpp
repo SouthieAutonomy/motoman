@@ -98,6 +98,8 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
   enabler_ = node_.advertiseService("/robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
   srv_ready_ = node_.advertiseService("/robot_ready", &MotomanJointTrajectoryStreamer::checkReadyCB, this);
 
+  // Attempt to remove the boot up alarms
+  motion_ctrl_.resetAlarm();
   return rtn;
 }
 
@@ -126,6 +128,8 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
   srv_read_single_io_ = node_.advertiseService("/read_single_io", &MotomanJointTrajectoryStreamer::readSingleIoCB, this);
   srv_write_single_io_ = node_.advertiseService("/write_single_io", &MotomanJointTrajectoryStreamer::writeSingleIoCB, this);
 
+  // Attempt to remove the boot up alarms
+  motion_ctrl_.resetAlarm();
   return rtn;
 }
 
@@ -179,6 +183,7 @@ bool MotomanJointTrajectoryStreamer::enableRobotCB(std_srvs::Trigger::Request &r
 						   std_srvs::Trigger::Response &res)
 {
   bool ret = motion_ctrl_.setTrajMode(true);
+  ret = ret && motion_ctrl_.resetAlarm(); // Reset the alarm while we're at it
   res.success = ret;
 
   if (!res.success) {

@@ -116,6 +116,25 @@ bool MotomanMotionCtrl::setTrajMode(bool enable)
   return true;
 }
 
+bool MotomanMotionCtrl::resetAlarm()
+{
+  MotionReply reply;
+
+  if (!sendAndReceive(MotionControlCmds::ROS_CMD_RESET_ALARM, reply))
+  {
+    ROS_ERROR("Failed to send ROS_CMD_RESET_ALARM command");
+    return false;
+  }
+
+  if (reply.getResult() != MotionReplyResults::SUCCESS)
+  {
+    ROS_ERROR_STREAM("Failed to Reset Alarm: " << getErrorString(reply));
+    return false;
+  }
+
+  return true;
+}
+
 bool MotomanMotionCtrl::stopTrajectory()
 {
   MotionReply reply;
