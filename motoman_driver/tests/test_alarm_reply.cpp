@@ -13,7 +13,7 @@
 #include <boost/algorithm/hex.hpp>
 
 int main (int argc, char **argv){
-  ros::init (argc, argv, "melfa_driver");
+  ros::init (argc, argv, "test_alarm_reply");
   ros::NodeHandle nh;
 
   std::string robot_ip = "10.36.85.192";
