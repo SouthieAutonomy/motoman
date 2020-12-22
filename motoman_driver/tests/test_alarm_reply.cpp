@@ -42,7 +42,8 @@ int main (int argc, char **argv){
   std::cout << "  > Successfully sent!\n";
   ros::Duration(1.0).sleep();
 
-
+  std::string msg(bytes, sizeof(bytes));
+  std::cout << "Sent: " << msg << "\n";
 
   std::cout << "  > Attempting to receive packet data\n";
 
