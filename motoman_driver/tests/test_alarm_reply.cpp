@@ -42,13 +42,35 @@ int main (int argc, char **argv){
   std::cout << "  > Successfully sent!\n";
 
   ros::Duration(1.0).sleep();
+
+
+
   std::cout << "  > Attempting to receive packet data\n";
+
+  fd_set fds;
+  timeval time;
+
+  FD_ZERO (&fds);
+  FD_SET (fd, &fds);
+
+  time.tv_sec = 0;
+  time.tv_usec = 2 * 0.5 * 1000000;
+
+  int status = select (fd+1, &fds, (fd_set *) NULL, (fd_set *) NULL, &time);
+  if (status < 0) { ROS_ERROR ("Cannot receive packet"); }
+
   char results[100] = {0};
-  size = recvfrom(fd, &results, sizeof (results), 0, NULL, NULL);
-  if (size < 0) {
-    ROS_ERROR ("recvfrom failed");
-    exit (1);
+  if ((status > 0) && FD_ISSET (fd, &fds)) {
+    int size = recvfrom(fd, &results, sizeof (results), 0, NULL, NULL);
+    if (size < 0) {
+      ROS_ERROR ("recvfrom failed");
+      exit (1);
+    }
   }
+  else {
+    exit(1);
+  }
+
   std::cout << "  > Successfully received!\n";
 
   char result_bytes[33];
