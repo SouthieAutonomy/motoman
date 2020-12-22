@@ -55,11 +55,10 @@ int main (int argc, char **argv){
   }
   std::cout << "  > Successfully received!\n";
 
-  // Attempt to parse out the bytes: 28 to 60 
+  // Attempt to parse out the bytes: 28 to 60
   char result_bytes[33];
   for (int i = 28; i < 60; i++){
     result_bytes[i-28] = results[i];
-    std::cout << results[i] << "\n";
   }
 
   // Print out the reply for debugging
