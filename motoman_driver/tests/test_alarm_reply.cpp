@@ -29,7 +29,7 @@ int main (int argc, char **argv){
   addr.sin_addr.s_addr = inet_addr (robot_ip.c_str());
 
   // 31 byte package info from Ted Miller: to request alarm data
-  std::string req = "59455243200000000301000000000000393939393939397000010000010000";
+  std::string req = "59455243200000000301000000000000393939393939397100010000010000";
   char bytes[31] = {0};
   std::string hash = boost::algorithm::unhex(req);
   std::copy(hash.begin(), hash.end(), bytes);
