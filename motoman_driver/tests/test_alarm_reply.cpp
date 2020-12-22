@@ -40,7 +40,6 @@ int main (int argc, char **argv){
     exit (1);
   }
   std::cout << "  > Successfully sent!\n";
-
   ros::Duration(1.0).sleep();
 
 
@@ -72,13 +71,10 @@ int main (int argc, char **argv){
   // }
   std::cout << "  > Successfully received!\n";
 
-  for (int i = 0; i < 100; i++){
-    std::cout << results[i] << "\n";
-  }
-
   char result_bytes[33];
   for (int i = 28; i < 60; i++){
     result_bytes[i-28] = results[i];
+    std::cout << results[i] << "\n";
   }
 
   // Print out the reply for debugging
