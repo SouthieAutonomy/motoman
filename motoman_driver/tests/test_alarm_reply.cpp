@@ -29,7 +29,7 @@ int main (int argc, char **argv){
   addr.sin_addr.s_addr = inet_addr (robot_ip.c_str());
 
   // 31 byte package info from Ted Miller: to request alarm data
-  std::string req = "59455243200000000301000000000000393939393939397100010000010000";
+  std::string req = "59455243200000000301000000000000393939393939397000010000010000";
   char bytes[31] = {0};
   std::string hash = boost::algorithm::unhex(req);
   std::copy(hash.begin(), hash.end(), bytes);
@@ -47,14 +47,14 @@ int main (int argc, char **argv){
 
   std::cout << "  > Attempting to receive packet data\n";
 
-  fd_set fds;
-  timeval time;
+  // fd_set fds;
+  // timeval time;
+  //
+  // FD_ZERO (&fds);
+  // FD_SET (fd, &fds);
 
-  FD_ZERO (&fds);
-  FD_SET (fd, &fds);
-
-  time.tv_sec = 0;
-  time.tv_usec = 2 * 0.5 * 1000000;
+  // time.tv_sec = 0;
+  // time.tv_usec = 2 * 0.5 * 1000000;
   //
   // int status = select (fd+1, &fds, (fd_set *) NULL, (fd_set *) NULL, &time);
   // if (status < 0) { ROS_ERROR ("Cannot receive packet"); }
