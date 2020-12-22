@@ -72,7 +72,9 @@ int main (int argc, char **argv){
   // }
   std::cout << "  > Successfully received!\n";
 
-
+  for (int i = 0; i < 100; i++){
+    std::cout << results[i] << "\n";
+  }
 
   char result_bytes[33];
   for (int i = 28; i < 60; i++){
