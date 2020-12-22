@@ -57,5 +57,16 @@ int main (int argc, char **argv){
   std::string mystr = ss.str();
   std::cout << mystr << "\n";
 
+  int len = mystr.length();
+  std::string newString;
+  for(int i=0; i< len; i+=2)
+  {
+      std::string byte = mystr.substr(i,2);
+      char chr = (char) (int)strtol(byte.c_str(), NULL, 16);
+      newString.push_back(chr);
+  }
+  std::cout << newString << "\n";
+
+
   return 0;
 }
