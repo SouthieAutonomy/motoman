@@ -51,8 +51,16 @@ int main (int argc, char **argv){
   }
   std::cout << "  > Successfully received!\n";
 
+  char result_bytes[33];
+  for (int i = 28; i < 60; i++){
+    result_bytes[i-28] = results[i];
+  }
+
   // Print out the reply for debugging
   std::string s(results, sizeof(results));
   std::cout << s << "\n";
+
+  std::string s2(result_bytes, sizeof(result_bytes));
+  std::cout << s2 << "\n";
   return 0;
 }
