@@ -51,6 +51,11 @@ int main (int argc, char **argv){
   }
   std::cout << "  > Successfully received!\n";
 
+
+  std::string s(results, sizeof(results));
+  std::cout << s << "\n";
+
+
   std::stringstream ss;
   for(int i=0; i<100; ++i)
       ss << std::hex << (int)results[i];
