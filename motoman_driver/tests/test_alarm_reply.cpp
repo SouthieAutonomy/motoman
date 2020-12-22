@@ -51,27 +51,8 @@ int main (int argc, char **argv){
   }
   std::cout << "  > Successfully received!\n";
 
-
+  // Print out the reply for debugging
   std::string s(results, sizeof(results));
   std::cout << s << "\n";
-
-
-  std::stringstream ss;
-  for(int i=0; i<100; ++i)
-      ss << std::hex << (int)results[i];
-  std::string mystr = ss.str();
-  std::cout << mystr << "\n";
-
-  int len = mystr.length();
-  std::string newString;
-  for(int i=0; i< len; i+=2)
-  {
-      std::string byte = mystr.substr(i,2);
-      char chr = (char) (int)strtol(byte.c_str(), NULL, 16);
-      newString.push_back(chr);
-  }
-  std::cout << newString << "\n";
-
-
   return 0;
 }
