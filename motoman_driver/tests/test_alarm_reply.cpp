@@ -55,6 +55,7 @@ int main (int argc, char **argv){
   for(int i=0; i<100; ++i)
       ss << std::hex << (int)results[i];
   std::string mystr = ss.str();
+  std::cout << mystr << "\n";
 
   return 0;
 }
