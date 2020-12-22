@@ -39,39 +39,23 @@ int main (int argc, char **argv){
     ROS_ERROR ("Connot send packet controller.");
     exit (1);
   }
+  std::string msg(bytes, sizeof(bytes));
+  std::cout << "  > Sent msg: " << msg << "\n";
   std::cout << "  > Successfully sent!\n";
   ros::Duration(1.0).sleep();
 
-  std::string msg(bytes, sizeof(bytes));
-  std::cout << "Sent: " << msg << "\n";
 
+  // Receive the reply from the socket
   std::cout << "  > Attempting to receive packet data\n";
-
-  // fd_set fds;
-  // timeval time;
-  //
-  // FD_ZERO (&fds);
-  // FD_SET (fd, &fds);
-
-  // time.tv_sec = 0;
-  // time.tv_usec = 2 * 0.5 * 1000000;
-  //
-  // int status = select (fd+1, &fds, (fd_set *) NULL, (fd_set *) NULL, &time);
-  // if (status < 0) { ROS_ERROR ("Cannot receive packet"); }
-  //
   char results[100] = {0};
-  // if ((status > 0) && FD_ISSET (fd, &fds)) {
-    size = recvfrom(fd, &results, sizeof (results), 0, NULL, NULL);
-    if (size < 0) {
-      ROS_ERROR ("recvfrom failed");
-      exit (1);
-    }
-  // }
-  // else {
-  //   exit(1);
-  // }
+  size = recvfrom(fd, &results, sizeof (results), 0, NULL, NULL);
+  if (size < 0) {
+    ROS_ERROR ("recvfrom failed");
+    exit (1);
+  }
   std::cout << "  > Successfully received!\n";
 
+  // Attempt to parse out the bytes: 28 to 60 
   char result_bytes[33];
   for (int i = 28; i < 60; i++){
     result_bytes[i-28] = results[i];
