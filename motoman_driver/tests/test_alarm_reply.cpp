@@ -34,6 +34,17 @@ int main (int argc, char **argv){
   std::string hash = boost::algorithm::unhex(req);
   std::copy(hash.begin(), hash.end(), bytes);
   int size = sendto (fd, (char *) &bytes, sizeof (bytes), 0, (struct sockaddr *) &addr, sizeof (addr));
+  if (size != sizeof (bytes)) {
+    ROS_ERROR ("Connot send packet controller.");
+    exit (1);
+  }
+
+  char results[100] = {0};
+  size = recvfrom(fd, &results, sizeof (results), 0, NULL, NULL);
+  if (size < 0) {
+    ROS_ERROR ("recvfrom failed");
+    exit (1);
+  }
 
   return 0;
 }
