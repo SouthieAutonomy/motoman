@@ -33,18 +33,23 @@ int main (int argc, char **argv){
   char bytes[31] = {0};
   std::string hash = boost::algorithm::unhex(req);
   std::copy(hash.begin(), hash.end(), bytes);
+  std::cout << "  > Sending packet data to controller\n";
   int size = sendto (fd, (char *) &bytes, sizeof (bytes), 0, (struct sockaddr *) &addr, sizeof (addr));
   if (size != sizeof (bytes)) {
     ROS_ERROR ("Connot send packet controller.");
     exit (1);
   }
+  std::cout << "  > Successfully sent!\n";
 
+  ros::Duration(1.0).sleep();
+  std::cout << "  > Attempting to receive packet data\n";
   char results[100] = {0};
   size = recvfrom(fd, &results, sizeof (results), 0, NULL, NULL);
   if (size < 0) {
     ROS_ERROR ("recvfrom failed");
     exit (1);
   }
+  std::cout << "  > Successfully received!\n";
 
   std::stringstream ss;
   for(int i=0; i<100; ++i)
