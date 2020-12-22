@@ -59,7 +59,7 @@ int main (int argc, char **argv){
   // int status = select (fd+1, &fds, (fd_set *) NULL, (fd_set *) NULL, &time);
   // if (status < 0) { ROS_ERROR ("Cannot receive packet"); }
   //
-  // char results[100] = {0};
+  char results[100] = {0};
   // if ((status > 0) && FD_ISSET (fd, &fds)) {
     size = recvfrom(fd, &results, sizeof (results), 0, NULL, NULL);
     if (size < 0) {
