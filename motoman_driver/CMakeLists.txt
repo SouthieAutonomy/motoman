@@ -130,6 +130,7 @@ set_target_properties(motoman_motion_streaming_interface
   PROPERTIES OUTPUT_NAME motion_streaming_interface
   PREFIX "")
 
+add_subdirectory(tests)
 
 #----------------------------------------------------------------
 # FS100 uses opposite byte-ordering from most i386-based PCs
