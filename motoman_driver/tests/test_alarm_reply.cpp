@@ -55,23 +55,24 @@ int main (int argc, char **argv){
 
   time.tv_sec = 0;
   time.tv_usec = 2 * 0.5 * 1000000;
-
-  int status = select (fd+1, &fds, (fd_set *) NULL, (fd_set *) NULL, &time);
-  if (status < 0) { ROS_ERROR ("Cannot receive packet"); }
-
-  char results[100] = {0};
-  if ((status > 0) && FD_ISSET (fd, &fds)) {
-    int size = recvfrom(fd, &results, sizeof (results), 0, NULL, NULL);
+  //
+  // int status = select (fd+1, &fds, (fd_set *) NULL, (fd_set *) NULL, &time);
+  // if (status < 0) { ROS_ERROR ("Cannot receive packet"); }
+  //
+  // char results[100] = {0};
+  // if ((status > 0) && FD_ISSET (fd, &fds)) {
+    size = recvfrom(fd, &results, sizeof (results), 0, NULL, NULL);
     if (size < 0) {
       ROS_ERROR ("recvfrom failed");
       exit (1);
     }
-  }
-  else {
-    exit(1);
-  }
-
+  // }
+  // else {
+  //   exit(1);
+  // }
   std::cout << "  > Successfully received!\n";
+
+
 
   char result_bytes[33];
   for (int i = 28; i < 60; i++){
