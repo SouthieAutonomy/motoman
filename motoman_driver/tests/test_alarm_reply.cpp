@@ -46,5 +46,10 @@ int main (int argc, char **argv){
     exit (1);
   }
 
+  std::stringstream ss;
+  for(int i=0; i<100; ++i)
+      ss << std::hex << (int)results[i];
+  std::string mystr = ss.str();
+
   return 0;
 }
