@@ -433,6 +433,20 @@ void MotomanJointTrajectoryStreamer::streamingThread()
 
     this->mutex_.lock();
 
+
+
+    std::string motion_status = "";
+    auto motion_reply = motion_ctrl_.controllerReadyVerbose();
+
+    if (!motion_reply.success){
+      motion_status = "NOT READY;" + motion_reply.verbose;
+    }
+    else {
+      motion_status = motion_reply.verbose;
+    }
+    ROS_INFO("MOTION STATUS %s", motion_status.c_str());
+
+
     SimpleMessage msg, tmpMsg, reply;
 
     switch (this->state_)
