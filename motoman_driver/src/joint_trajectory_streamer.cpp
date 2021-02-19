@@ -161,6 +161,7 @@ bool MotomanJointTrajectoryStreamer::disableRobotCB(std_srvs::Trigger::Request &
 bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &req,
 						   std_srvs::Trigger::Response &res)
 {
+  this->mutex_.lock();
   auto reply = motion_ctrl_.controllerReadyVerbose();
   res.success = reply.success;
 
@@ -170,7 +171,7 @@ bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &re
   else {
     res.message = reply.verbose;
   }
-
+  this->mutex_.unlock();
   return true;
 
 }
