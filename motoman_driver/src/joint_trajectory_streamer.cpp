@@ -141,6 +141,7 @@ bool MotomanJointTrajectoryStreamer::disableRobotCB(std_srvs::Trigger::Request &
 
   trajectoryStop();
 
+  this->mutex_.lock();
   bool ret = motion_ctrl_.setTrajMode(false);
   res.success = ret;
 
@@ -152,10 +153,8 @@ bool MotomanJointTrajectoryStreamer::disableRobotCB(std_srvs::Trigger::Request &
     res.message="Motoman robot is now disabled and will NOT accept motion commands.";
     ROS_WARN_STREAM(res.message);
   }
-
-
+  this->mutex_.unlock();
   return true;
-
 }
 
 bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &req,
@@ -179,6 +178,7 @@ bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &re
 bool MotomanJointTrajectoryStreamer::enableRobotCB(std_srvs::Trigger::Request &req,
 						   std_srvs::Trigger::Response &res)
 {
+  this->mutex_.lock();
   bool ret = motion_ctrl_.setTrajMode(true);
   res.success = ret;
 
@@ -190,7 +190,7 @@ bool MotomanJointTrajectoryStreamer::enableRobotCB(std_srvs::Trigger::Request &r
     res.message="Motoman robot is now enabled and will accept motion commands.";
     ROS_WARN_STREAM(res.message);
   }
-
+  this->mutex_.unlock();
   return true;
 
 }
