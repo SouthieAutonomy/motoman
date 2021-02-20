@@ -94,10 +94,10 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
   srv_read_single_io_ = node_.advertiseService("/read_single_io", &MotomanJointTrajectoryStreamer::readSingleIoCB, this);
   srv_write_single_io_ = node_.advertiseService("/write_single_io", &MotomanJointTrajectoryStreamer::writeSingleIoCB, this);
 
+  pub_status_ = node_.advertise<std_msgs::String> ("robot_status", 1);
   disabler_ = node_.advertiseService("/robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
   enabler_ = node_.advertiseService("/robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
   srv_ready_ = node_.advertiseService("/robot_ready", &MotomanJointTrajectoryStreamer::checkReadyCB, this);
-
   return rtn;
 }
 
@@ -117,15 +117,15 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
 
   rtn &= motion_ctrl_.init(connection, robot_id_);
 
-  disabler_ = node_.advertiseService("robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
-  enabler_ = node_.advertiseService("robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
-  srv_ready_ = node_.advertiseService("/robot_ready", &MotomanJointTrajectoryStreamer::checkReadyCB, this);
-
   // hacking this in here at this place
   io_ctrl_.init(connection);
   srv_read_single_io_ = node_.advertiseService("/read_single_io", &MotomanJointTrajectoryStreamer::readSingleIoCB, this);
   srv_write_single_io_ = node_.advertiseService("/write_single_io", &MotomanJointTrajectoryStreamer::writeSingleIoCB, this);
 
+  pub_status_ = node_.advertise<std_msgs::String> ("robot_status", 1);
+  disabler_ = node_.advertiseService("robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
+  enabler_ = node_.advertiseService("robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
+  srv_ready_ = node_.advertiseService("/robot_ready", &MotomanJointTrajectoryStreamer::checkReadyCB, this);
   return rtn;
 }
 
@@ -434,20 +434,17 @@ void MotomanJointTrajectoryStreamer::streamingThread()
 
     this->mutex_.lock();
 
-
-
+    // Publish out the internal motion status so that we do not need to query it
     std::string motion_status = "";
     auto motion_reply = motion_ctrl_.controllerReadyVerbose();
+    if (!motion_reply.success){ motion_status = "NOT READY;" + motion_reply.verbose; }
+    else { motion_status = motion_reply.verbose; }
 
-    if (!motion_reply.success){
-      motion_status = "NOT READY;" + motion_reply.verbose;
-    }
-    else {
-      motion_status = motion_reply.verbose;
-    }
-    ROS_INFO("MOTION STATUS %s", motion_status.c_str());
+    std_msgs::String status_msg;
+    status_msg.data = motion_status;
+    pub_status_.publish(status_msg);
 
-
+    // Begin streaming the trajectory information
     SimpleMessage msg, tmpMsg, reply;
 
     switch (this->state_)
