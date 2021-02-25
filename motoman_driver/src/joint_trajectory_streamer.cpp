@@ -122,7 +122,7 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
   srv_read_single_io_ = node_.advertiseService("/read_single_io", &MotomanJointTrajectoryStreamer::readSingleIoCB, this);
   srv_write_single_io_ = node_.advertiseService("/write_single_io", &MotomanJointTrajectoryStreamer::writeSingleIoCB, this);
 
-  pub_status_ = node_.advertise<std_msgs::String> ("robot_status", 1);
+  pub_status_ = node_.advertise<std_msgs::String> ("robot_internal_status", 1);
   disabler_ = node_.advertiseService("robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
   enabler_ = node_.advertiseService("robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
   srv_ready_ = node_.advertiseService("/robot_ready", &MotomanJointTrajectoryStreamer::checkReadyCB, this);
