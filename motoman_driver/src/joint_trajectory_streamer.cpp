@@ -160,8 +160,8 @@ bool MotomanJointTrajectoryStreamer::disableRobotCB(std_srvs::Trigger::Request &
 bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &req,
 						   std_srvs::Trigger::Response &res)
 {
-  this->mutex_.lock();
-  auto reply = motion_ctrl_.controllerReadyVerbose();
+  // this->mutex_.lock();
+  auto reply = ready_status_; // motion_ctrl_.controllerReadyVerbose();
   res.success = reply.success;
 
   if (!res.success){
@@ -170,7 +170,7 @@ bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &re
   else {
     res.message = reply.verbose;
   }
-  this->mutex_.unlock();
+  // this->mutex_.unlock();
   return true;
 
 }
@@ -437,6 +437,7 @@ void MotomanJointTrajectoryStreamer::streamingThread()
     // Publish out the internal motion status so that we do not need to query it
     std::string motion_status = "";
     auto motion_reply = motion_ctrl_.controllerReadyVerbose();
+    ready_status_ = motion_reply;
     if (!motion_reply.success){ motion_status = "NOT READY;" + motion_reply.verbose; }
     else { motion_status = motion_reply.verbose; }
 

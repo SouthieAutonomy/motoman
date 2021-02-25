@@ -178,6 +178,8 @@ protected:
 
   ros::ServiceServer srv_ready_;
 
+  ControllerReadyResponse ready_status_;
+
   /**
    * \brief Disable the robot. Response is true if the state was flipped or
    * false if the state has not changed.
