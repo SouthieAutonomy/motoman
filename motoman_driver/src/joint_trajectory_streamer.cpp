@@ -94,10 +94,10 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
   srv_read_single_io_ = node_.advertiseService("/read_single_io", &MotomanJointTrajectoryStreamer::readSingleIoCB, this);
   srv_write_single_io_ = node_.advertiseService("/write_single_io", &MotomanJointTrajectoryStreamer::writeSingleIoCB, this);
 
+  pub_status_ = node_.advertise<std_msgs::String> ("robot_status", 1);
   disabler_ = node_.advertiseService("/robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
   enabler_ = node_.advertiseService("/robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
   srv_ready_ = node_.advertiseService("/robot_ready", &MotomanJointTrajectoryStreamer::checkReadyCB, this);
-
   return rtn;
 }
 
@@ -117,15 +117,15 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
 
   rtn &= motion_ctrl_.init(connection, robot_id_);
 
-  disabler_ = node_.advertiseService("robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
-  enabler_ = node_.advertiseService("robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
-  srv_ready_ = node_.advertiseService("/robot_ready", &MotomanJointTrajectoryStreamer::checkReadyCB, this);
-
   // hacking this in here at this place
   io_ctrl_.init(connection);
   srv_read_single_io_ = node_.advertiseService("/read_single_io", &MotomanJointTrajectoryStreamer::readSingleIoCB, this);
   srv_write_single_io_ = node_.advertiseService("/write_single_io", &MotomanJointTrajectoryStreamer::writeSingleIoCB, this);
 
+  pub_status_ = node_.advertise<std_msgs::String> ("robot_internal_status", 1);
+  disabler_ = node_.advertiseService("robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
+  enabler_ = node_.advertiseService("robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
+  srv_ready_ = node_.advertiseService("/robot_ready", &MotomanJointTrajectoryStreamer::checkReadyCB, this);
   return rtn;
 }
 
@@ -141,6 +141,7 @@ bool MotomanJointTrajectoryStreamer::disableRobotCB(std_srvs::Trigger::Request &
 
   trajectoryStop();
 
+  this->mutex_.lock();
   bool ret = motion_ctrl_.setTrajMode(false);
   res.success = ret;
 
@@ -152,15 +153,14 @@ bool MotomanJointTrajectoryStreamer::disableRobotCB(std_srvs::Trigger::Request &
     res.message="Motoman robot is now disabled and will NOT accept motion commands.";
     ROS_WARN_STREAM(res.message);
   }
-
-
+  this->mutex_.unlock();
   return true;
-
 }
 
 bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &req,
 						   std_srvs::Trigger::Response &res)
 {
+  this->mutex_.lock();
   auto reply = motion_ctrl_.controllerReadyVerbose();
   res.success = reply.success;
 
@@ -170,7 +170,7 @@ bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &re
   else {
     res.message = reply.verbose;
   }
-
+  this->mutex_.unlock();
   return true;
 
 }
@@ -178,6 +178,7 @@ bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &re
 bool MotomanJointTrajectoryStreamer::enableRobotCB(std_srvs::Trigger::Request &req,
 						   std_srvs::Trigger::Response &res)
 {
+  this->mutex_.lock();
   bool ret = motion_ctrl_.setTrajMode(true);
   res.success = ret;
 
@@ -189,7 +190,7 @@ bool MotomanJointTrajectoryStreamer::enableRobotCB(std_srvs::Trigger::Request &r
     res.message="Motoman robot is now enabled and will accept motion commands.";
     ROS_WARN_STREAM(res.message);
   }
-
+  this->mutex_.unlock();
   return true;
 
 }
@@ -433,6 +434,17 @@ void MotomanJointTrajectoryStreamer::streamingThread()
 
     this->mutex_.lock();
 
+    // Publish out the internal motion status so that we do not need to query it
+    std::string motion_status = "";
+    auto motion_reply = motion_ctrl_.controllerReadyVerbose();
+    if (!motion_reply.success){ motion_status = "NOT READY;" + motion_reply.verbose; }
+    else { motion_status = motion_reply.verbose; }
+
+    std_msgs::String status_msg;
+    status_msg.data = motion_status;
+    pub_status_.publish(status_msg);
+
+    // Begin streaming the trajectory information
     SimpleMessage msg, tmpMsg, reply;
 
     switch (this->state_)

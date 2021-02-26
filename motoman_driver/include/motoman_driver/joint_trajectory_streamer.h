@@ -42,7 +42,11 @@
 #include "motoman_driver/io_ctrl.h"
 #include "motoman_msgs/ReadSingleIO.h"
 #include "motoman_msgs/WriteSingleIO.h"
-#include "std_srvs/Trigger.h"
+#include <std_srvs/Trigger.h>
+#include <std_msgs/String.h>
+
+#include "motoman_driver/simple_message/motoman_motion_ctrl_message.h"
+
 
 namespace motoman
 {
@@ -50,7 +54,7 @@ namespace joint_trajectory_streamer
 {
 
 using motoman::motion_ctrl::MotomanMotionCtrl;
- using motoman::io_ctrl::MotomanIoCtrl;
+using motoman::io_ctrl::MotomanIoCtrl;
 using industrial_robot_client::joint_trajectory_streamer::JointTrajectoryStreamer;
 using industrial::simple_message::SimpleMessage;
 using industrial::smpl_msg_connection::SmplMsgConnection;
@@ -141,6 +145,7 @@ protected:
 
   std::map<int, MotomanMotionCtrl> motion_ctrl_map_;
 
+  ros::Publisher pub_status_;
   ros::ServiceServer srv_read_single_io_;   // handle for read_single_io service
   ros::ServiceServer srv_write_single_io_;   // handle for write_single_io service
 
@@ -156,6 +161,8 @@ protected:
 
   static bool VectorToJointData(const std::vector<double> &vec,
                                 industrial::joint_data::JointData &joints);
+
+  bool sendAndReceive(motion_ctrl::MotionControlCmd command, motion_ctrl::MotionReply &reply);
 
   /**
    * \brief Service used to disable the robot controller.  When disabled,
