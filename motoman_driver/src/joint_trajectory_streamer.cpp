@@ -399,8 +399,11 @@ bool MotomanJointTrajectoryStreamer::VectorToJointData(const std::vector<double>
 // override send_to_robot to provide controllerReady() and setTrajMode() calls
 bool MotomanJointTrajectoryStreamer::send_to_robot(const std::vector<SimpleMessage>& messages)
 {
-  if (!motion_ctrl_.controllerReady())
+  this->mutex_.lock();
+  if (!motion_ctrl_.controllerReady()){
     ROS_ERROR_RETURN(false, "Failed to initialize MotoRos motion, trajectory execution ABORTED. If safe, call the 'robot_enable' service to (re-)enable Motoplus motion and retry.");
+  }
+  this->mutex_.unlock();
 
   return JointTrajectoryStreamer::send_to_robot(messages);
 }
