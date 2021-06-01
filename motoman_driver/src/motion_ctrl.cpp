@@ -69,6 +69,24 @@ bool MotomanMotionCtrl::controllerReady()
   return (reply.getResult() == MotionReplyResults::TRUE);
 }
 
+ControllerReadyResponse MotomanMotionCtrl::controllerReadyVerbose()
+{
+  std::string err_str;
+  MotionReply reply;
+
+  ControllerReadyResponse resp;
+  if (!sendAndReceive(MotionControlCmds::CHECK_MOTION_READY, reply))
+  {
+    ROS_ERROR("Failed to send CHECK_MOTION_READY command");
+    resp.success = false;
+    resp.verbose = "Failed to send CHECK_MOTION_READY command";
+    return resp;
+  }
+
+  resp.success = (reply.getResult() == MotionReplyResults::TRUE);
+  resp.verbose = getErrorString(reply);
+  return resp;
+}
 
 bool MotomanMotionCtrl::setTrajMode(bool enable)
 {
@@ -144,4 +162,3 @@ std::string MotomanMotionCtrl::getErrorString(const MotionReply &reply)
 
 }  // namespace motion_ctrl
 }  // namespace motoman
-

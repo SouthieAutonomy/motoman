@@ -94,8 +94,9 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
   this->srv_read_single_io = node_.advertiseService("read_single_io", &MotomanJointTrajectoryStreamer::readSingleIoCB, this);
   this->srv_write_single_io = node_.advertiseService("write_single_io", &MotomanJointTrajectoryStreamer::writeSingleIoCB, this);
 
+  pub_status_ = node_.advertise<std_msgs::String> ("robot_internal_status", 1);
+  srv_ready_ = node_.advertiseService("robot_ready", &MotomanJointTrajectoryStreamer::checkReadyCB, this);
   disabler_ = node_.advertiseService("robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
-
   enabler_ = node_.advertiseService("robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
 
   return rtn;
@@ -117,8 +118,14 @@ bool MotomanJointTrajectoryStreamer::init(SmplMsgConnection* connection, const s
 
   rtn &= motion_ctrl_.init(connection, robot_id_);
 
-  disabler_ = node_.advertiseService("robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
+  // hacking this in here at this place
+  io_ctrl_.init(connection);
+  this->srv_read_single_io = node_.advertiseService("read_single_io", &MotomanJointTrajectoryStreamer::readSingleIoCB, this);
+  this->srv_write_single_io = node_.advertiseService("write_single_io", &MotomanJointTrajectoryStreamer::writeSingleIoCB, this);
 
+  pub_status_ = node_.advertise<std_msgs::String> ("robot_internal_status", 1);
+  srv_ready_ = node_.advertiseService("robot_ready", &MotomanJointTrajectoryStreamer::checkReadyCB, this);
+  disabler_ = node_.advertiseService("robot_disable", &MotomanJointTrajectoryStreamer::disableRobotCB, this);
   enabler_ = node_.advertiseService("robot_enable", &MotomanJointTrajectoryStreamer::enableRobotCB, this);
 
   return rtn;
@@ -130,11 +137,29 @@ MotomanJointTrajectoryStreamer::~MotomanJointTrajectoryStreamer()
   motion_ctrl_.setTrajMode(false);   // release TrajMode, so INFORM jobs can run
 }
 
+bool MotomanJointTrajectoryStreamer::checkReadyCB(std_srvs::Trigger::Request &req,
+						   std_srvs::Trigger::Response &res)
+{
+  this->mutex_.lock();
+  auto reply = motion_ctrl_.controllerReadyVerbose();
+  res.success = reply.success;
+
+  if (!res.success){
+    res.message = "NOT READY;" + reply.verbose;
+  }
+  else {
+    res.message = reply.verbose;
+  }
+  this->mutex_.unlock();
+  return true;
+}
+
 bool MotomanJointTrajectoryStreamer::disableRobotCB(std_srvs::Trigger::Request &req,
                                            std_srvs::Trigger::Response &res)
 {
-
   trajectoryStop();
+
+  this->mutex_.lock();
 
   bool ret = motion_ctrl_.setTrajMode(false);
   res.success = ret;
@@ -148,7 +173,7 @@ bool MotomanJointTrajectoryStreamer::disableRobotCB(std_srvs::Trigger::Request &
     ROS_WARN_STREAM(res.message);
   }
 
-
+  this->mutex_.unlock();
   return true;
 
 }
@@ -156,6 +181,7 @@ bool MotomanJointTrajectoryStreamer::disableRobotCB(std_srvs::Trigger::Request &
 bool MotomanJointTrajectoryStreamer::enableRobotCB(std_srvs::Trigger::Request &req,
 						   std_srvs::Trigger::Response &res)
 {
+  this->mutex_.lock();
   bool ret = motion_ctrl_.setTrajMode(true);
   res.success = ret;
 
@@ -167,9 +193,8 @@ bool MotomanJointTrajectoryStreamer::enableRobotCB(std_srvs::Trigger::Request &r
     res.message="Motoman robot is now enabled and will accept motion commands.";
     ROS_WARN_STREAM(res.message);
   }
-
+  this->mutex_.unlock();
   return true;
-
 }
 
 
@@ -411,6 +436,16 @@ void MotomanJointTrajectoryStreamer::streamingThread()
 
     this->mutex_.lock();
 
+    // Publish out the internal motion status so that we do not need to query it
+    std::string motion_status = "";
+    auto motion_reply = motion_ctrl_.controllerReadyVerbose();
+    if (!motion_reply.success){ motion_status = "NOT READY;" + motion_reply.verbose; }
+    else { motion_status = motion_reply.verbose; }
+
+    std_msgs::String status_msg;
+    status_msg.data = motion_status;
+    pub_status_.publish(status_msg);
+
     SimpleMessage msg, tmpMsg, reply;
 
     switch (this->state_)
@@ -517,8 +552,8 @@ bool MotomanJointTrajectoryStreamer::is_valid(const trajectory_msgs::JointTrajec
 
 // Service to read a single IO
 bool MotomanJointTrajectoryStreamer::readSingleIoCB(
-  motoman_msgs::ReadSingleIO::Request &req,
-  motoman_msgs::ReadSingleIO::Response &res)
+  mercury::ReadSingleIO::Request &req,
+  mercury::ReadSingleIO::Response &res)
 {
   shared_int io_val= -1;
 
@@ -540,8 +575,8 @@ bool MotomanJointTrajectoryStreamer::readSingleIoCB(
 
 // Service to write Single IO
 bool MotomanJointTrajectoryStreamer::writeSingleIoCB(
-  motoman_msgs::WriteSingleIO::Request &req,
-  motoman_msgs::WriteSingleIO::Response &res)
+  mercury::WriteSingleIO::Request &req,
+  mercury::WriteSingleIO::Response &res)
 {
   shared_int io_val= -1;
 

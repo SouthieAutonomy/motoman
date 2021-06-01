@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(motoman_driver)
 
+add_compile_options(-std=c++11)
+
 # Load catkin and all dependencies required for this package
 find_package(
   catkin
@@ -19,6 +21,7 @@ find_package(
     std_srvs
     trajectory_msgs
     urdf
+    mercury
 )
 
 find_package(Boost REQUIRED COMPONENTS system thread)
@@ -50,6 +53,7 @@ catkin_package(
     std_srvs
     trajectory_msgs
     urdf
+    mercury
   INCLUDE_DIRS
     include
 )

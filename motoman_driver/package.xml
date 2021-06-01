@@ -34,4 +34,5 @@
   <depend>std_srvs</depend>
   <depend>trajectory_msgs</depend>
   <depend>urdf</depend>
+  <depend>mercury</depend>
 </package>
